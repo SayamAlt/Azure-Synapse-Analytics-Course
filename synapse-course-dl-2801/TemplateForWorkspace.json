@@ -326,12 +326,12 @@
 					"name": "nyc_taxi/ldw"
 				},
 				"content": {
-					"query": "USE nyc_taxi_ldw;\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'nyc_taxi_src')\nCREATE EXTERNAL DATA SOURCE nyc_taxi_src\nWITH (\n    LOCATION = 'https://synapsecoursedl28.dfs.core.windows.net/nyc-taxi-data'\n)",
+					"query": "USE nyc_taxi_ldw;\n\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'nyc_taxi_src')\nCREATE EXTERNAL DATA SOURCE nyc_taxi_src\nWITH (\n    LOCATION = 'https://synapsecoursedl2801.dfs.core.windows.net/nyc-taxi-data'\n)",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "master",
+						"databaseName": "nyc_taxi_ldw",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
