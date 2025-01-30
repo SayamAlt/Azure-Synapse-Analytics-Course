@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "synapse-course-dl-2801"
+		},
+		"synapse-course-dl-2801-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapse-course-dl-2801.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"bing-covid-19-data_sasUri": {
+			"value": ""
+		},
+		"synapse-course-dl-2801-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://synapsecoursedl2801.dfs.core.windows.net"
+		},
+		"synapse_course_dl_2801_ls_properties_typeProperties_url": {
+			"value": "https://synapsecoursedl2801.dfs.core.windows.net/"
+		}
+	}
+}
