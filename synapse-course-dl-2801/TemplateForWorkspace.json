@@ -56,6 +56,86 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/pl_create_silver_taxi_zone')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Delete Silver Taxi Zone Folder",
+						"type": "Delete",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "ds_silver_taxi_zone",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							}
+						}
+					},
+					{
+						"name": "Create Silver Taxi Zone",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "Delete Silver Taxi Zone Folder",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "ls_serverless_sql_pool_db_nyc_taxi_ldw",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "IF OBJECT_ID('silver.taxi_zone') IS NOT NULL\n    DROP EXTERNAL TABLE silver.taxi_zone"
+								},
+								{
+									"type": "Query",
+									"text": "CREATE EXTERNAL TABLE silver.taxi_zone\nWITH (\n    LOCATION = 'silver/taxi_zone',\n    DATA_SOURCE = nyc_taxi_src,\n    FILE_FORMAT = parquet_file_format\n)\nAS\nSELECT * FROM bronze.taxi_zone"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/ds_silver_taxi_zone')]",
+				"[concat(variables('workspaceId'), '/linkedServices/ls_serverless_sql_pool_db_nyc_taxi_ldw')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/ds_nyc_taxi_data_dynamic')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -1250,7 +1330,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "9778de55-e362-4553-a454-02943fe42423"
+						"spark.autotune.trackingId": "293a17b8-0986-4455-98a9-eee2958168cd"
 					}
 				},
 				"metadata": {
@@ -1329,7 +1409,7 @@
 							"gold_folder_path = 'abfss://nyc-taxi-data@synapsecoursedl2801.dfs.core.windows.net/gold'"
 						],
 						"outputs": [],
-						"execution_count": 12
+						"execution_count": 24
 					},
 					{
 						"cell_type": "code",
@@ -1349,7 +1429,7 @@
 							"spark.conf.set(\"spark.sql.sources.partitionColumnTypeInference.enabled\", \"false\")"
 						],
 						"outputs": [],
-						"execution_count": 13
+						"execution_count": 25
 					},
 					{
 						"cell_type": "code",
@@ -1374,10 +1454,10 @@
 							"-- Create database to which we are going to write the data\n",
 							"\n",
 							"CREATE DATABASE IF NOT EXISTS nyc_taxi_ldw_spark\n",
-							"LOCATION 'abfss://nyc-taxi-data@synapsecoursedl2801.dfs.core.windows.net/gold';"
+							"LOCATION 'abfss://nyc-taxi-data@synapsecoursedl2801.dfs.core.windows.net/gold'"
 						],
 						"outputs": [],
-						"execution_count": 16
+						"execution_count": 30
 					},
 					{
 						"cell_type": "code",
@@ -1397,7 +1477,7 @@
 							"trip_data_green_df = spark.read.parquet(f\"{silver_folder_path}/trip_data_green\") "
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 27
 					},
 					{
 						"cell_type": "code",
@@ -1424,7 +1504,7 @@
 							"                        round(sum(\"fare_amount\"), 2).alias(\"total_fare_amount\"))"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 28
 					},
 					{
 						"cell_type": "code",
@@ -1445,7 +1525,7 @@
 							"trip_data_green_agg_df.write.mode(\"overwrite\").partitionBy(\"year\", \"month\").format(\"parquet\").saveAsTable(\"nyc_taxi_ldw_spark.trip_data_green_agg\")"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 29
 					}
 				]
 			},
@@ -1577,6 +1657,86 @@
 			},
 			"dependsOn": [],
 			"location": "canadacentral"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/pl_create_silver_taxi_zone_copy1')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Delete Silver Taxi Zone Folder",
+						"type": "Delete",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "ds_silver_taxi_zone",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							}
+						}
+					},
+					{
+						"name": "Create Silver Taxi Zone",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "Delete Silver Taxi Zone Folder",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "ls_serverless_sql_pool_db_nyc_taxi_ldw",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "IF OBJECT_ID('silver.taxi_zone') IS NOT NULL\n    DROP EXTERNAL TABLE silver.taxi_zone"
+								},
+								{
+									"type": "Query",
+									"text": "CREATE EXTERNAL TABLE silver.taxi_zone\nWITH (\n    LOCATION = 'silver/taxi_zone',\n    DATA_SOURCE = nyc_taxi_src,\n    FILE_FORMAT = parquet_file_format\n)\nAS\nSELECT * FROM bronze.taxi_zone"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/ds_silver_taxi_zone')]",
+				"[concat(variables('workspaceId'), '/linkedServices/ls_serverless_sql_pool_db_nyc_taxi_ldw')]"
+			]
 		}
 	]
 }
