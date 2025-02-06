@@ -16,6 +16,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'sasUri' of 'bing-covid-19-data'"
 		},
+		"ls_serverless_sql_pool_db_nyc_taxi_ldw_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "tcp:synapse-course-dl-2801-ondemand.sql.azuresynapse.net,1433"
+		},
+		"ls_serverless_sql_pool_db_nyc_taxi_ldw_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "nyc_taxi_ldw"
+		},
 		"synapse-course-dl-2801-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://synapsecoursedl2801.dfs.core.windows.net"
@@ -46,6 +54,39 @@
 				"annotations": []
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ds_nyc_taxi_data_dynamic')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "synapse_course_dl_2801_ls",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"p_folder_path": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().p_folder_path",
+							"type": "Expression"
+						},
+						"fileSystem": "nyc-taxi-data"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/synapse_course_dl_2801_ls')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/ds_silver_taxi_zone')]",
@@ -84,6 +125,29 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ls_serverless_sql_pool_db_nyc_taxi_ldw')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"server": "[parameters('ls_serverless_sql_pool_db_nyc_taxi_ldw_properties_typeProperties_server')]",
+					"database": "[parameters('ls_serverless_sql_pool_db_nyc_taxi_ldw_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SystemAssignedManagedIdentity"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/synapse-course-dl-2801-WorkspaceDefaultSqlServer')]",
