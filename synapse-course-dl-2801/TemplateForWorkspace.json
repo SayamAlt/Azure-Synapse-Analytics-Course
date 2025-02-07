@@ -56,7 +56,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/pl_create_gold_trip_data_green')]",
+			"name": "[concat(parameters('workspaceName'), '/pl_create_gold_tables')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -753,7 +753,7 @@
 						}
 					},
 					{
-						"name": "Create Gold Trip Data Green",
+						"name": "Create Gold Tables",
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
@@ -775,7 +775,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "pl_create_gold_trip_data_green",
+								"referenceName": "pl_create_gold_tables",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": true,
@@ -791,7 +791,7 @@
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/pipelines/pl_create_silver_tables')]",
 				"[concat(variables('workspaceId'), '/pipelines/pl_create_silver_trip_data_green')]",
-				"[concat(variables('workspaceId'), '/pipelines/pl_create_gold_trip_data_green')]"
+				"[concat(variables('workspaceId'), '/pipelines/pl_create_gold_tables')]"
 			]
 		},
 		{
