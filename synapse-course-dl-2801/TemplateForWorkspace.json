@@ -237,6 +237,9 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"folder": {
+					"name": "demo"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -629,6 +632,9 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"folder": {
+					"name": "demo"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -747,6 +753,9 @@
 				"linkedServiceName": {
 					"referenceName": "synapse_course_dl_2801_ls",
 					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "demo"
 				},
 				"annotations": [],
 				"type": "Parquet",
